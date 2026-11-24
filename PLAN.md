@@ -19,9 +19,9 @@ Work in this order. Run each step and confirm it works before starting the next.
 
 ## 2. Synthetic data
 
-- [ ] Script that generates a small synthetic dataset (candidates with phase, modality, indication and a progression outcome)
-- [ ] Script uploads the raw files to a container in Azurite
-- [ ] Data clearly labelled as synthetic
+- [x] Script that generates a small synthetic dataset (candidates with phase, modality, indication and a progression outcome)
+- [x] Script uploads the raw files to a container in Azurite
+- [x] Data clearly labelled as synthetic
 
 ## 3. Curation function
 

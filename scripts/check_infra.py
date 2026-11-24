@@ -1,10 +1,9 @@
 """Check that the infrastructure containers (Azurite, MongoDB, MLflow) answer.
 
-Run with: uv run python scripts/check_infra.py
+Run with: uv run python -m scripts.check_infra
 Exit code is non-zero if any service fails.
 """
 
-import os
 import sys
 import uuid
 
@@ -12,14 +11,7 @@ import requests
 from azure.storage.blob import BlobServiceClient
 from pymongo import MongoClient
 
-AZURITE_CONNECTION_STRING = os.environ.get(
-    "AZURITE_CONNECTION_STRING",
-    "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-    "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-    "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
-)
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
-MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000")
+from common.settings import AZURITE_CONNECTION_STRING, MLFLOW_TRACKING_URI, MONGO_URI
 
 
 def check_azurite() -> None:
