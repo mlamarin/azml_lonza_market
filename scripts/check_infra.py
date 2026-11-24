@@ -1,6 +1,6 @@
 """Check that the infrastructure containers (Azurite, MongoDB, MLflow) answer.
 
-Run with: uv run python -m scripts.check_infra
+Run with: uv run python scripts/check_infra.py
 Exit code is non-zero if any service fails.
 """
 
@@ -11,7 +11,7 @@ import requests
 from azure.storage.blob import BlobServiceClient
 from pymongo import MongoClient
 
-from common.settings import AZURITE_CONNECTION_STRING, MLFLOW_TRACKING_URI, MONGO_URI
+from azml_market.settings import AZURITE_CONNECTION_STRING, MLFLOW_TRACKING_URI, MONGO_URI
 
 
 def check_azurite() -> None:

@@ -10,16 +10,16 @@ resolution-markers = [
 [[package]]
 name = "azml-lonza-market"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
+    { name = "azure-storage-blob" },
+    { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "azure-storage-blob" },
-    { name = "matplotlib" },
     { name = "pymongo" },
     { name = "pytest" },
     { name = "requests" },
@@ -27,14 +27,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "azure-storage-blob" },
+    { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "azure-storage-blob" },
-    { name = "matplotlib" },
     { name = "pymongo" },
     { name = "pytest" },
     { name = "requests" },

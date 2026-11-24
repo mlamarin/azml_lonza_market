@@ -1,6 +1,6 @@
-"""Plot the SYNTHETIC dataset written by data.generate.
+"""Plot the SYNTHETIC dataset written by generate-data.
 
-Run with: uv run python -m data.plot_synthetic
+Run with: uv run plot-data
 """
 
 import argparse
@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from data.generate import PHASES
+from azml_market.data.generate import PHASES
 
 
 def load(data_dir: Path) -> pd.DataFrame:
@@ -71,7 +71,7 @@ def plot_observed_vs_true(df: pd.DataFrame, path: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(prog="plot-data", description=__doc__.splitlines()[0])
     parser.add_argument("--data-dir", type=Path, default=Path("data/output"))
     args = parser.parse_args()
 

@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import pytest
 
-from data.generate import RAW_COLUMNS, generate, write_outputs
+from azml_market.data.generate import RAW_COLUMNS, generate, write_outputs
 
 
 @pytest.fixture(scope="module")

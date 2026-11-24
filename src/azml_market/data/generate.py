@@ -11,7 +11,7 @@ All coefficients and proportions below are ARBITRARY ILLUSTRATIVE VALUES.
 They are not published success rates and say nothing about real clinical
 progression.
 
-Run with: uv run python -m data.generate --seed 42
+Run with: uv run generate-data --seed 42
 """
 
 import argparse
@@ -207,7 +207,7 @@ def write_outputs(raw: pd.DataFrame, truth: pd.DataFrame, out_dir: Path, seed: i
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(prog="generate-data", description=__doc__.splitlines()[0])
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-candidates", type=int, default=150, help="candidates per batch")
     parser.add_argument("--out", type=Path, default=Path("data/output"))
