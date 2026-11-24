@@ -1,0 +1,14 @@
+[project]
+name = "azml-lonza-market"
+version = "0.1.0"
+description = "Local sandbox mimicking a market-modelling data and ML stack on Azure (synthetic data only)"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "azure-storage-blob",
+    "pymongo",
+    "requests",
+    "pytest",
+]
