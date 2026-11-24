@@ -15,7 +15,7 @@ Work in this order. Run each step and confirm it works before starting the next.
 - [x] `docker-compose.yml` with Azurite, MongoDB and MLflow
 - [x] Azurite reachable (blob endpoint answers)
 - [x] MongoDB reachable (a test document can be inserted and read)
-- [ ] MLflow UI opens in the browser
+- [x] MLflow UI opens in the browser
 
 ## 2. Synthetic data
 
