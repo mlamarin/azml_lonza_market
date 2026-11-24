@@ -25,10 +25,10 @@ Work in this order. Run each step and confirm it works before starting the next.
 
 ## 3. Curation function
 
-- [ ] Azure Functions app created in `functions/`
-- [ ] Blob-triggered function reads the raw file from Azurite
-- [ ] Cleaned records written to MongoDB
-- [ ] Schema check on the raw file (first contract test)
+- [x] Azure Functions app created in `functions/`
+- [x] Blob-triggered function reads the raw file from Azurite
+- [x] Cleaned records written to MongoDB
+- [x] Schema check on the raw file (first contract test)
 
 ## 4. Training and validation
 

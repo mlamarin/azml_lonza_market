@@ -13,4 +13,5 @@ AZURITE_CONNECTION_STRING = os.environ.get(
     "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
 )
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
+MONGO_DB = os.environ.get("MONGO_DB", "market")
 MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000")

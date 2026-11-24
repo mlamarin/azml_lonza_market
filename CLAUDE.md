@@ -67,5 +67,5 @@ azml_lonza_market/
 - Install the environment: `UV_LINK_MODE=copy uv sync` (installs `azml_market` in editable mode)
 - Check the services: `uv run python scripts/check_infra.py`
 - Generate, upload and plot the synthetic data: `uv run generate-data`, `uv run upload-data`, `uv run plot-data`
-- Run the functions locally: `func start` inside `functions/`
+- Run the functions locally: `cd functions && source ../.venv/bin/activate && func start` (needs `functions/local.settings.json`, copied from `local.settings.example.json`). The host must use the project .venv so that `azml_market` is importable.
 - Run the tests: `uv run pytest`

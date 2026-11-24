@@ -1,0 +1,6 @@
+# Locally, func start runs inside the project .venv (uv sync), which already
+# holds these packages and azml_market. For a real Azure deployment, the
+# azml_market package would also have to be shipped (built wheel or vendored).
+azure-functions
+pydantic
+pymongo

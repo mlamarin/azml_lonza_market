@@ -13,7 +13,7 @@ It is a learning and demonstration project. It is **not** a copy of any company'
 | 0 | Environment (Docker, uv, Azure Functions Core Tools) | Done |
 | 1 | Infrastructure containers (Azurite, MongoDB, MLflow) | Done |
 | 2 | Synthetic data generator and upload to Azurite | Done |
-| 3 | Curation function (blob trigger to MongoDB) | To do |
+| 3 | Curation function (blob trigger to MongoDB) | Done |
 | 4 | Training and validation (MLflow, Brier score, promotion) | To do |
 | 5 | Serving (FastAPI) and interface (Streamlit) | To do |
 | 6 | Unit, contract and end-to-end tests | To do |
@@ -56,6 +56,18 @@ One row is one **phase transition** of one **candidate-indication pair**, for ex
 
 Fields: `record_id`, `candidate_id`, `indication_area`, `modality`, `from_phase`, `to_phase`, `sponsor_type`, `biomarker_selected`, `orphan_designation`, `start_year`, `batch_id`, `data_origin`, `progressed`.
 
+## Curation
+
+The blob-triggered function `curate_raw_blob` ([functions/function_app.py](functions/function_app.py)) fires for every file under `raw/clinical-progression/` and calls [curate.py](src/azml_market/curation/curate.py):
+
+- Each row is checked against the schema contract in [schema.py](src/azml_market/curation/schema.py) (allowed values, types, `to_phase` following `from_phase`, no unknown column).
+- Valid rows become one MongoDB document per transition in `market.transitions`, with `_id = record_id` and an `_ingestion` block (source file, timestamp, schema version).
+- Invalid rows go one by one to `market.rejected`, with the raw row and the reasons. The rest of the file is still curated.
+- Writes are upserts on `_id`, so replaying a batch, in CSV or in JSON, leaves the same final state.
+- The truth file in container `reference` is never read by curation.
+
+How the Functions host, the blob trigger and its receipts work is explained in [functions/README.md](functions/README.md).
+
 ## Getting started
 
 Requirements: Docker with the compose plugin, [uv](https://docs.astral.sh/uv/), Azure Functions Core Tools v4.
@@ -73,6 +85,11 @@ uv run python scripts/check_infra.py
 uv run generate-data --seed 42     # writes data/output/raw and data/output/truth
 uv run upload-data                 # raw files to container "raw", truth to "reference"
 uv run plot-data                   # PNGs in data/output/plots
+
+# Curation (Azure Functions, local host)
+cp functions/local.settings.example.json functions/local.settings.json
+cd functions && source ../.venv/bin/activate && func start
+# each file landing in raw/clinical-progression/ is curated into MongoDB
 
 # Tests
 uv run pytest
@@ -99,7 +116,7 @@ src/azml_market/          installable Python package (src layout)
 scripts/                  standalone entry points (infrastructure checks)
 tests/                    unit tests
 data/output/              generated files, not versioned
-functions/                Azure Functions app (planned)
+functions/                Azure Functions app (curation)
 api/                      FastAPI service (planned)
 ui/                       Streamlit app (planned)
 ```
