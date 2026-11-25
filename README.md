@@ -84,6 +84,19 @@ uv run train-model --model logistic          # or: curl -X POST "http://localhos
 uv run approve-model                         # or: curl -X POST "http://localhost:7071/api/approve"
 ```
 
+### Two ways to start training, one code path
+
+Both entry points call the same function, `train_and_validate()` in [pipeline.py](src/azml_market/training/pipeline.py). Only the trigger differs:
+
+| Trigger | What the caller needs |
+| --- | --- |
+| `uv run train-model` | The repository, the Python environment, and network access to MongoDB, Azurite and MLflow |
+| `POST /api/train` | Any HTTP client (`curl`, a browser, another service) that can reach the Functions host |
+
+MLflow does not start training: it records what the training code sends to it (parameters, metrics, artifacts, models). In both cases our code trains, then writes to MLflow.
+
+The HTTP route lets any client start a training run without Python or uv (a Streamlit button, a scheduler, Data Factory), keeps connection settings on the host side, and returns a JSON contract (model version, metrics, verdict). In Azure it can also be restricted with a function key or Entra ID, which matters most for `approve`. The call is synchronous: the request waits for training to finish, which is fine for this small dataset but not for real training (see [functions/README.md](functions/README.md#http-functions)).
+
 ## Getting started
 
 Requirements: Docker with the compose plugin, [uv](https://docs.astral.sh/uv/), Azure Functions Core Tools v4.

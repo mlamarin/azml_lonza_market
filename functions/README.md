@@ -134,7 +134,23 @@ Locally the admin API needs no key. In Azure it is protected by the host keys st
 | `train` | `POST /api/train?model=logistic\|boosting` | Train, log to MLflow, register a version, validate it against the champion |
 | `approve_model` | `POST /api/approve[?version=N]` | Human approval: the challenger (or version N, if it passed validation) becomes champion |
 
-Both use `auth_level=ANONYMOUS` for local testing. In Azure they would require a function key or an Entra ID token.
+They run the same code as the commands `uv run train-model` and `uv run approve-model`. The HTTP route only changes who can trigger it: any HTTP client that reaches the host, with no Python environment and no access to the connection settings.
+
+### How the host serves them
+
+```python
+@app.route(route="train", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
+def train(req: func.HttpRequest) -> func.HttpResponse: ...
+```
+
+- The host runs a web server on port 7071 and prefixes every route with `/api`, so `route="train"` becomes `http://localhost:7071/api/train`. These URLs are listed under `Functions:` at start-up.
+- On each request the host passes a `func.HttpRequest` to the Python worker and sends back the `func.HttpResponse` the function returns. Query parameters are in `req.params` (`?model=boosting`), the body in `req.get_json()`.
+- `methods=["POST"]`: any other method gets a 404 from the host, the code is not called.
+- `auth_level`: `ANONYMOUS` needs no key (used here, local only). `FUNCTION` needs a function key in `?code=...` or the `x-functions-key` header. `ADMIN` needs the host master key. Keys live in container `azure-webjobs-secrets`.
+- Unlike the blob trigger, there is no scan, no receipt and no automatic retry. The call is synchronous and an uncaught exception becomes a 500 for the caller, which is why `ValueError` is turned into a 400 with a message.
+- In Azure, an HTTP-triggered call is cut after about 230 seconds whatever the plan. Long work should not run inside the request: the function would put a message on a queue and answer at once, or hand the job to Azure ML.
+
+### Lazy import
 
 `azml_market.training` is imported inside these two functions, not at the top of `function_app.py`. Importing MLflow and scikit-learn from `/mnt/c` takes tens of seconds, long enough for the host to give up while asking the worker for its function list (it then stops with `Value cannot be null. (Parameter 'provider')`). The cost moves to the first HTTP call instead. Training inside an HTTP request is fine for this small synthetic dataset; real training would be delegated to Azure ML, and HTTP functions have execution time limits.
 
