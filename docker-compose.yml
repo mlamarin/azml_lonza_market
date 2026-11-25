@@ -29,6 +29,32 @@ services:
     volumes:
       - mlflow-data:/mlflow
 
+  # Development services: dependencies come from the image, code is mounted from the project.
+  api:
+    build: .
+    command: uvicorn azml_market.api.app:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      WATCHFILES_FORCE_POLLING: "true"  # file events do not cross the /mnt/c mount
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mlflow
+
+  ui:
+    build: .
+    command: streamlit run ui/app.py --server.address 0.0.0.0 --server.port 8501 --server.fileWatcherType poll --server.headless true
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - api
+
 volumes:
   azurite-data:
   mongo-data:

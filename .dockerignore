@@ -1,0 +1,6 @@
+.venv
+data/output
+**/__pycache__
+.pytest_cache
+.git
+functions/local.settings.json

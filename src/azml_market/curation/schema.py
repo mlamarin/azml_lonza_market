@@ -13,6 +13,26 @@ SCHEMA_VERSION = 1
 
 NEXT_PHASE = {"I": "II", "II": "III", "III": "Filing"}
 
+# Allowed values, shared with the prediction API.
+IndicationArea = Literal[
+    "oncology",
+    "immunology",
+    "neurology",
+    "infectious_disease",
+    "rare_disease",
+    "cardiometabolic",
+]
+Modality = Literal[
+    "small_molecule",
+    "monoclonal_antibody",
+    "antibody_drug_conjugate",
+    "cell_therapy",
+    "gene_therapy",
+    "peptide",
+]
+Phase = Literal["I", "II", "III"]
+SponsorType = Literal["large_pharma", "biotech"]
+
 
 class TransitionRecord(BaseModel):
     """One phase transition of one candidate-indication pair."""
@@ -22,25 +42,11 @@ class TransitionRecord(BaseModel):
 
     record_id: str = Field(min_length=1)
     candidate_id: str = Field(min_length=1)
-    indication_area: Literal[
-        "oncology",
-        "immunology",
-        "neurology",
-        "infectious_disease",
-        "rare_disease",
-        "cardiometabolic",
-    ]
-    modality: Literal[
-        "small_molecule",
-        "monoclonal_antibody",
-        "antibody_drug_conjugate",
-        "cell_therapy",
-        "gene_therapy",
-        "peptide",
-    ]
-    from_phase: Literal["I", "II", "III"]
+    indication_area: IndicationArea
+    modality: Modality
+    from_phase: Phase
     to_phase: Literal["II", "III", "Filing"]
-    sponsor_type: Literal["large_pharma", "biotech"]
+    sponsor_type: SponsorType
     biomarker_selected: bool
     orphan_designation: bool
     start_year: int = Field(ge=1990, le=2100)

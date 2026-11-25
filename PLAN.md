@@ -35,13 +35,13 @@ Work in this order. Run each step and confirm it works before starting the next.
 - [x] HTTP-triggered function reads curated data and trains a simple model
 - [x] Parameters, metrics and the model logged to MLflow, including the Brier score
 - [x] Reliability curve data and an aggregate test computed and logged
-- [ ] Validation step compares with the current registered model and promotes only if better (implemented with human approval: passing version gets alias `challenger`, `approve` makes it `champion`; comparison against a champion still to demonstrate)
+- [x] Validation step compares with the current registered model and promotes only if better (human approval: passing version gets alias `challenger`, `approve` makes it `champion`; demonstrated: boosting v2 rejected against logistic v1)
 
 ## 5. Serving and interface
 
-- [ ] FastAPI service loads the promoted model from the registry and exposes a prediction endpoint
-- [ ] Streamlit app calls the API and shows probabilities and the calibration curve
-- [ ] Both services added to `docker-compose.yml`
+- [x] FastAPI service loads the promoted model from the registry and exposes a prediction endpoint
+- [x] Streamlit app calls the API and shows probabilities and the calibration curve
+- [x] Both services added to `docker-compose.yml`
 
 ## 6. Tests between components
 

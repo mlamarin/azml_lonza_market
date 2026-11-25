@@ -14,8 +14,8 @@ It is a learning and demonstration project. It is **not** a copy of any company'
 | 1 | Infrastructure containers (Azurite, MongoDB, MLflow) | Done |
 | 2 | Synthetic data generator and upload to Azurite | Done |
 | 3 | Curation function (blob trigger to MongoDB) | Done |
-| 4 | Training and validation (MLflow, Brier score, promotion) | In progress |
-| 5 | Serving (FastAPI) and interface (Streamlit) | To do |
+| 4 | Training and validation (MLflow, Brier score, promotion) | Done |
+| 5 | Serving (FastAPI) and interface (Streamlit) | Done |
 | 6 | Unit, contract and end-to-end tests | To do |
 
 See [PLAN.md](PLAN.md) for the detailed checklist.
@@ -28,8 +28,8 @@ See [PLAN.md](PLAN.md) for the detailed checklist.
 | MongoDB or Cosmos DB for MongoDB (curated data) | MongoDB container |
 | Orchestration (Data Factory, Airflow) | Azure Functions run locally with Core Tools |
 | Azure ML (managed training and registry) | Python training code plus MLflow |
-| Prediction service | FastAPI container (planned) |
-| User interface | Streamlit container (planned) |
+| Prediction service | FastAPI container |
+| User interface | Streamlit container |
 
 ```
 synthetic generator --> Azurite "raw" --> curation function --> MongoDB
@@ -97,6 +97,22 @@ MLflow does not start training: it records what the training code sends to it (p
 
 The HTTP route lets any client start a training run without Python or uv (a Streamlit button, a scheduler, Data Factory), keeps connection settings on the host side, and returns a JSON contract (model version, metrics, verdict). In Azure it can also be restricted with a function key or Entra ID, which matters most for `approve`. The call is synchronous: the request waits for training to finish, which is fine for this small dataset but not for real training (see [functions/README.md](functions/README.md#http-functions)).
 
+## Serving and interface
+
+**Prediction API** ([src/azml_market/api/](src/azml_market/api/), container `api`, port 8000):
+
+| Route | Role |
+| --- | --- |
+| `GET /models` | Registered versions with model kind, aliases, validation status and test metrics |
+| `POST /predict?model=champion` | Probability of progression for a list of transitions, with the model version used. `model` is an alias (default `champion`) or a version number |
+| `GET /models/{model}/calibration` | Reliability curve of that version and of the truth `p_true`, plus Brier and Spiegelhalter results, as logged at training time |
+
+The alias is resolved on every request, so approving a new champion takes effect at once without restarting the API. Loaded models are cached by version, since a registered version never changes. Interactive documentation is at http://localhost:8000/docs.
+
+**Streamlit app** ([ui/app.py](ui/app.py), container `ui`, port 8501): choose a model (champion by default), enter one transition, get its probability and the model that produced it, and see the reliability curve of that model next to the truth curve. The app talks to the API only and does not import `azml_market`: it reads the allowed input values from the API's OpenAPI document, which is the contract between the two services.
+
+Both services run from one development image ([Dockerfile](Dockerfile)) that holds the dependencies only. The project is mounted on `/app`, so code changes reload without a rebuild. A deployed image would copy the code instead.
+
 ## Getting started
 
 Requirements: Docker with the compose plugin, [uv](https://docs.astral.sh/uv/), Azure Functions Core Tools v4.
@@ -120,6 +136,9 @@ cp functions/local.settings.example.json functions/local.settings.json
 cd functions && source ../.venv/bin/activate && func start
 # each file landing in raw/clinical-progression/ is curated into MongoDB
 
+# Prediction API and Streamlit app (after a champion exists)
+docker compose up -d --build api ui
+
 # Tests
 uv run pytest
 ```
@@ -133,6 +152,8 @@ Service endpoints:
 | Azurite Blob | http://localhost:10000 |
 | MongoDB | mongodb://localhost:27017 |
 | MLflow UI | http://localhost:5000 |
+| Prediction API (docs at `/docs`) | http://localhost:8000 |
+| Streamlit app | http://localhost:8501 |
 
 Settings are read from environment variables with local defaults, see [settings.py](src/azml_market/settings.py) and [.env.example](.env.example).
 
@@ -146,8 +167,11 @@ scripts/                  standalone entry points (infrastructure checks)
 tests/                    unit tests
 data/output/              generated files, not versioned
 functions/                Azure Functions app (curation)
-api/                      FastAPI service (planned)
-ui/                       Streamlit app (planned)
+    api/                  FastAPI prediction service
+    training/             split, models, metrics, MLflow pipeline
+    curation/             schema contract and curation
+ui/                       Streamlit app (talks to the API only)
+Dockerfile                development image for the api and ui services
 ```
 
 `uv sync` installs the package in editable mode, so `import azml_market` works from tests, scripts and services, and the commands `generate-data`, `upload-data` and `plot-data` are available through `uv run`.

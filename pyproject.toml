@@ -6,13 +6,17 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "azure-functions",
     "azure-storage-blob",
+    "fastapi",
     "matplotlib",
     "mlflow==2.17.2",
     "numpy",
     "pandas",
     "pydantic",
     "pymongo",
+    "requests",
     "scikit-learn",
+    "streamlit",
+    "uvicorn[standard]",
 ]
 
 [project.scripts]
@@ -31,7 +35,7 @@ packages = ["src/azml_market"]
 
 [dependency-groups]
 dev = [
-    "requests",
+    "httpx",
     "pytest",
 ]
 
