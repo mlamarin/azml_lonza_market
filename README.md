@@ -107,7 +107,7 @@ The HTTP route lets any client start a training run without Python or uv (a Stre
 | `POST /predict?model=champion` | Probability of progression for a list of transitions, with the model version used. `model` is an alias (default `champion`) or a version number |
 | `GET /models/{model}/calibration` | Reliability curve of that version and of the truth `p_true`, plus Brier and Spiegelhalter results, as logged at training time |
 
-The alias is resolved on every request, so approving a new champion takes effect at once without restarting the API. Loaded models are cached by version, since a registered version never changes. Interactive documentation is at http://localhost:8000/docs.
+The alias is resolved on every request, so approving a new champion takes effect at once without restarting the API. Loaded models are cached by version, since a registered version never changes. Interactive documentation is at http://localhost:8000/docs; design, examples and errors are described in [src/azml_market/api/README.md](src/azml_market/api/README.md).
 
 **Streamlit app** ([ui/app.py](ui/app.py), container `ui`, port 8501): choose a model (champion by default), enter one transition, get its probability and the model that produced it, and see the reliability curve of that model next to the truth curve. The app talks to the API only and does not import `azml_market`: it reads the allowed input values from the API's OpenAPI document, which is the contract between the two services.
 

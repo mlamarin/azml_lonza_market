@@ -28,6 +28,9 @@ app = FastAPI(
 )
 
 
+NOT_FOUND = {404: {"description": "No model version or alias with that name"}}
+
+
 def get_registry(request: Request) -> ModelRegistry:
     return request.app.state.registry
 
@@ -42,7 +45,7 @@ def list_models(registry: ModelRegistry = Depends(get_registry)) -> list[dict]:
     return registry.list_versions()
 
 
-@app.post("/predict", response_model=PredictResponse)
+@app.post("/predict", response_model=PredictResponse, responses=NOT_FOUND)
 def predict(
     body: PredictRequest, model: str = CHAMPION, registry: ModelRegistry = Depends(get_registry)
 ) -> dict:
@@ -61,7 +64,7 @@ def predict(
     }
 
 
-@app.get("/models/{model}/calibration", response_model=CalibrationResponse)
+@app.get("/models/{model}/calibration", response_model=CalibrationResponse, responses=NOT_FOUND)
 def calibration(model: str, registry: ModelRegistry = Depends(get_registry)) -> dict:
     try:
         return registry.calibration(registry.resolve(model))
