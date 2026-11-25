@@ -7,16 +7,20 @@ dependencies = [
     "azure-functions",
     "azure-storage-blob",
     "matplotlib",
+    "mlflow==2.17.2",
     "numpy",
     "pandas",
     "pydantic",
     "pymongo",
+    "scikit-learn",
 ]
 
 [project.scripts]
 generate-data = "azml_market.data.generate:main"
 upload-data = "azml_market.data.upload:main"
 plot-data = "azml_market.data.plot:main"
+train-model = "azml_market.training.pipeline:train_cli"
+approve-model = "azml_market.training.pipeline:approve_cli"
 
 [build-system]
 requires = ["hatchling"]

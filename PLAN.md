@@ -19,7 +19,7 @@ Work in this order. Run each step and confirm it works before starting the next.
 
 ## 2. Synthetic data
 
-- [x] Script that generates a small synthetic dataset (candidates with phase, modality, indication and a progression outcome)
+- [x] Script that generates a small synthetic dataset (candidates with phase, modality, indication and a progression outcome) 
 - [x] Script uploads the raw files to a container in Azurite
 - [x] Data clearly labelled as synthetic
 
@@ -32,10 +32,10 @@ Work in this order. Run each step and confirm it works before starting the next.
 
 ## 4. Training and validation
 
-- [ ] HTTP-triggered function reads curated data and trains a simple model
-- [ ] Parameters, metrics and the model logged to MLflow, including the Brier score
-- [ ] Reliability curve data and an aggregate test computed and logged
-- [ ] Validation step compares with the current registered model and promotes only if better
+- [x] HTTP-triggered function reads curated data and trains a simple model
+- [x] Parameters, metrics and the model logged to MLflow, including the Brier score
+- [x] Reliability curve data and an aggregate test computed and logged
+- [ ] Validation step compares with the current registered model and promotes only if better (implemented with human approval: passing version gets alias `challenger`, `approve` makes it `champion`; comparison against a champion still to demonstrate)
 
 ## 5. Serving and interface
 

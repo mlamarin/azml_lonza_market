@@ -68,4 +68,5 @@ azml_lonza_market/
 - Check the services: `uv run python scripts/check_infra.py`
 - Generate, upload and plot the synthetic data: `uv run generate-data`, `uv run upload-data`, `uv run plot-data`
 - Run the functions locally: `cd functions && source ../.venv/bin/activate && func start` (needs `functions/local.settings.json`, copied from `local.settings.example.json`). The host must use the project .venv so that `azml_market` is importable.
+- Train and validate a model: `uv run train-model --model logistic|boosting` (or `POST /api/train`). Approve the challenger as champion: `uv run approve-model` (or `POST /api/approve`). Approval is a human step: never run it on the user's behalf.
 - Run the tests: `uv run pytest`

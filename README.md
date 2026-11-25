@@ -14,7 +14,7 @@ It is a learning and demonstration project. It is **not** a copy of any company'
 | 1 | Infrastructure containers (Azurite, MongoDB, MLflow) | Done |
 | 2 | Synthetic data generator and upload to Azurite | Done |
 | 3 | Curation function (blob trigger to MongoDB) | Done |
-| 4 | Training and validation (MLflow, Brier score, promotion) | To do |
+| 4 | Training and validation (MLflow, Brier score, promotion) | In progress |
 | 5 | Serving (FastAPI) and interface (Streamlit) | To do |
 | 6 | Unit, contract and end-to-end tests | To do |
 
@@ -67,6 +67,22 @@ The blob-triggered function `curate_raw_blob` ([functions/function_app.py](funct
 - The truth file in container `reference` is never read by curation.
 
 How the Functions host, the blob trigger and its receipts work is explained in [functions/README.md](functions/README.md).
+
+## Training and validation
+
+Code in [src/azml_market/training/](src/azml_market/training/), exposed as HTTP functions and as commands.
+
+- **Data**: curated transitions from MongoDB. Split 70 % train, 30 % test, stratified on `from_phase` x `progressed` and grouped by candidate, so that a candidate's dependent transitions never sit on both sides.
+- **Models**: `logistic` (logistic regression on one-hot categories, like `glm(family = binomial)`) or `boosting` (shallow gradient-boosted trees). Features: phase, modality, indication area, sponsor type, biomarker selection, orphan designation.
+- **Logged to MLflow** (experiment `clinical-progression`): parameters, test Brier score, Spiegelhalter calibration test (z and p-value), reliability curve (CSV and PNG), test predictions, and the model, registered as a new version of `clinical-progression`.
+- **Truth diagnostics**: because the data are synthetic, the run also logs the mean absolute gap between predictions and `p_true`, and the Brier score of `p_true` itself (the best any model could do on that test set). These are never used to fit or to promote.
+- **Validation**: the new version is scored on the same test set as the current `champion`. It passes if its Brier score is lower and the Spiegelhalter test does not reject its calibration (p >= 0.05). A passing version gets the alias `challenger`; the outcome and reason are stored as version tags.
+- **Approval**: a human call to `approve` moves the `champion` alias to the challenger. Only versions with `validation_status = passed` can be approved.
+
+```bash
+uv run train-model --model logistic          # or: curl -X POST "http://localhost:7071/api/train?model=logistic"
+uv run approve-model                         # or: curl -X POST "http://localhost:7071/api/approve"
+```
 
 ## Getting started
 

@@ -127,6 +127,17 @@ If the function raises an exception, the host retries it. After several failed a
 
 Locally the admin API needs no key. In Azure it is protected by the host keys stored in `azure-webjobs-secrets`.
 
+## HTTP functions
+
+| Function | Route | Role |
+| --- | --- | --- |
+| `train` | `POST /api/train?model=logistic\|boosting` | Train, log to MLflow, register a version, validate it against the champion |
+| `approve_model` | `POST /api/approve[?version=N]` | Human approval: the challenger (or version N, if it passed validation) becomes champion |
+
+Both use `auth_level=ANONYMOUS` for local testing. In Azure they would require a function key or an Entra ID token.
+
+`azml_market.training` is imported inside these two functions, not at the top of `function_app.py`. Importing MLflow and scikit-learn from `/mnt/c` takes tens of seconds, long enough for the host to give up while asking the worker for its function list (it then stops with `Value cannot be null. (Parameter 'provider')`). The cost moves to the first HTTP call instead. Training inside an HTTP request is fine for this small synthetic dataset; real training would be delegated to Azure ML, and HTTP functions have execution time limits.
+
 ## Code layout
 
 `function_app.py` stays thin: it receives the blob and calls `curate_blob` from the `azml_market` package. Parsing, schema validation and the MongoDB write live in [src/azml_market/curation/](../src/azml_market/curation/), where they are unit tested without any running service (`uv run pytest`).
