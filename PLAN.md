@@ -53,3 +53,7 @@ Work in this order. Run each step and confirm it works before starting the next.
 
 - [ ] Short README: what is reproduced, what is not (Azure ML, Fabric, full orchestration), how to run it
 - [ ] Note what was learned and what would change in a real Azure deployment
+
+## Later (deferred, prototype scope)
+
+- [ ] Record history and audit: keep every version of a raw file (replayable), and make the evolution of a record queryable. Decided so far: audit of a record's evolution is the need; history lives at raw-file level; an old valid version stays in `transitions` when a newer one is rejected (current behaviour).

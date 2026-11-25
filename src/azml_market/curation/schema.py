@@ -51,5 +51,7 @@ class TransitionRecord(BaseModel):
     @model_validator(mode="after")
     def to_phase_follows_from_phase(self) -> "TransitionRecord":
         if NEXT_PHASE[self.from_phase] != self.to_phase:
-            raise ValueError(f"to_phase {self.to_phase!r} does not follow from_phase {self.from_phase!r}")
+            raise ValueError(
+                f"to_phase {self.to_phase!r} does not follow from_phase {self.from_phase!r}"
+            )
         return self

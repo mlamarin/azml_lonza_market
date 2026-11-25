@@ -48,7 +48,9 @@ def parse_raw(content: bytes, blob_name: str) -> list[dict]:
     raise ValueError(f"{blob_name}: unsupported file type {suffix!r}")
 
 
-def curate_rows(rows: list[dict], source: str, now: datetime | None = None) -> CurationResult:
+def curate_rows(
+    rows: list[dict], source: str, now: datetime | None = None
+) -> CurationResult:
     """Validate each row against the schema. Valid rows become curated documents."""
     now = now or datetime.now(UTC)
     ingestion = {"source": source, "ingested_at": now, "schema_version": SCHEMA_VERSION}
@@ -64,7 +66,8 @@ def curate_rows(rows: list[dict], source: str, now: datetime | None = None) -> C
                     "row_number": row_number,
                     "raw": row,
                     "errors": [
-                        {"field": ".".join(map(str, e["loc"])), "message": e["msg"]} for e in exc.errors()
+                        {"field": ".".join(map(str, e["loc"])), "message": e["msg"]}
+                        for e in exc.errors()
                     ],
                     "rejected_at": now,
                 }
@@ -85,7 +88,8 @@ def write_result(db: Database, result: CurationResult) -> None:
     ):
         if documents:
             db[collection].bulk_write(
-                [ReplaceOne({"_id": d["_id"]}, d, upsert=True) for d in documents], ordered=False
+                [ReplaceOne({"_id": d["_id"]}, d, upsert=True) for d in documents],
+                ordered=False,
             )
 
 
